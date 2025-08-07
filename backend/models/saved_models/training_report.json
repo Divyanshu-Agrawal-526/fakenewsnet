@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-08-07T11:23:13.966176",
+  "models_trained": [
+    "fake_news_detector",
+    "disaster_classifier"
+  ],
+  "results": {
+    "fake_news_detector": {
+      "status": "trained",
+      "samples": 23196,
+      "fake_samples": 5755,
+      "real_samples": 17441
+    },
+    "disaster_classifier": {
+      "status": "trained",
+      "samples": 33075,
+      "unique_events": 6
+    }
+  },
+  "model_paths": {
+    "fake_news_detector": "models/saved_models/fake_news_detector",
+    "disaster_classifier": "models/saved_models/disaster_classifier",
+    "multimodal_classifier": "models/saved_models/multimodal_classifier"
+  }
+}

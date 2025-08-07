@@ -1,0 +1,80 @@
+name: Train Fake News Detection Model
+
+on:
+  schedule:
+    # Run every Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    # Allow manual triggering
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/models/**'
+      - 'data/**'
+      - '.github/workflows/train-model.yml'
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        
+    - name: Download NLTK data
+      run: |
+        python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet')"
+        
+    - name: Train all models
+      run: |
+        cd backend
+        python train_models.py
+        
+    - name: Upload trained models
+      uses: actions/upload-artifact@v3
+      with:
+        name: trained-models
+        path: |
+          backend/models/saved_models/
+          backend/models/checkpoints/
+        retention-days: 30
+        
+    - name: Run model evaluation
+      run: |
+        cd backend
+        python -c "
+        from models.fake_news_detector import FakeNewsDetector
+        detector = FakeNewsDetector()
+        results = detector.evaluate()
+        print(f'Fake News Detection Results: {results}')
+        "
+        
+    - name: Create model report
+      run: |
+        echo "# Model Training Report" > model_report.md
+        echo "Date: $(date)" >> model_report.md
+        echo "Models trained successfully" >> model_report.md
+        
+    - name: Upload model report
+      uses: actions/upload-artifact@v3
+      with:
+        name: model-report
+        path: model_report.md 
