@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-11T11:11:58.476384",
+  "models_trained": [
+    "fake_news_detector"
+  ],
+  "results": {
+    "fake_news_detector": {
+      "status": "trained",
+      "samples": 23196,
+      "fake_samples": 5755,
+      "real_samples": 17441,
+      "accuracy": 0.8273706896551725
+    }
+  },
+  "model_paths": {
+    "fake_news_detector": "models/saved_models/fake_news_detector",
+    "disaster_classifier": "models/saved_models/disaster_classifier"
+  }
+}

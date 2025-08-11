@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, Flask
 from werkzeug.utils import secure_filename
 import os
 import logging
@@ -15,6 +15,10 @@ from utils.authority_contact import AuthorityContact
 from utils.image_processor import ImageProcessor
 from utils.text_processor import TextProcessor
 
+# Integrated system imports
+import pandas as pd
+from integrated_disaster_system import IntegratedDisasterSystem
+
 # Create blueprint
 api_bp = Blueprint('api', __name__)
 
@@ -27,12 +31,139 @@ authority_contact = AuthorityContact()
 image_processor = ImageProcessor()
 text_processor = TextProcessor()
 
+# Initialize integrated disaster system (singleton for the API process)
+integrated_system = IntegratedDisasterSystem(
+    n_topics=6,
+    similarity_threshold=0.3,
+    min_community_size=5
+)
+
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def convert_keys_to_str(obj):
+    if isinstance(obj, dict):
+        return {str(k): convert_keys_to_str(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_keys_to_str(i) for i in obj]
+    else:
+        return obj
+
+@api_bp.route('/integrated/process', methods=['POST'])
+def integrated_process():
+    """
+    Run the integrated pipeline on a batch of texts
+    Body: { "texts": ["...", "..."], "load_detector_path": "optional/model/dir" }
+    """
+    try:
+        data = request.get_json()
+        if not data or 'texts' not in data:
+            return jsonify({'error': 'texts array is required'}), 400
+
+        texts = [t if isinstance(t, str) else str(t) for t in data['texts']]
+
+        # Optionally load misinformation detector
+        model_dir = data.get('load_detector_path')
+        if model_dir:
+            integrated_system.load_misinformation_detector(model_dir)
+
+        results = integrated_system.process_dataset(texts)
+        return jsonify(results), 200
+    except Exception as e:
+        logging.exception("Error in integrated_process")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@api_bp.route('/integrated/summary', methods=['GET'])
+def integrated_summary():
+    """
+    Get summaries for topics, communities, and geographic distribution
+    """
+    try:
+        return jsonify({
+            'topics': convert_keys_to_str(integrated_system.get_topic_summary()),
+            'communities': convert_keys_to_str(integrated_system.get_community_summary()),
+            'geography': convert_keys_to_str(integrated_system.get_geographic_summary())
+        }), 200
+    except Exception as e:
+        logging.exception("Error in integrated_summary")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@api_bp.route('/integrated/subscribe', methods=['GET'])
+def integrated_subscribe():
+    """
+    Subscribe to updates for a topic with optional location filter
+    Query: topic_id=int&location=optional
+    """
+    try:
+        topic_id_raw = request.args.get('topic_id')
+        if topic_id_raw is None:
+            return jsonify({'error': 'topic_id is required'}), 400
+        try:
+            topic_id = int(topic_id_raw)
+        except ValueError:
+            return jsonify({'error': 'topic_id must be an integer'}), 400
+
+        location_filter = request.args.get('location')
+        updates = integrated_system.subscribe_to_topic(topic_id=topic_id, location_filter=location_filter)
+        return jsonify({'updates': updates}), 200
+    except Exception as e:
+        logging.exception("Error in integrated_subscribe")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@api_bp.route('/integrated/load-detector', methods=['POST'])
+def integrated_load_detector():
+    """
+    Load misinformation detector from a saved model directory
+    Body: { "path": "models/saved_models/fn_bert_tfidf" }
+    """
+    try:
+        data = request.get_json()
+        model_path = data.get('path') if data else None
+        if not model_path:
+            return jsonify({'error': 'path is required'}), 400
+        integrated_system.load_misinformation_detector(model_path)
+        return jsonify({'status': 'loaded'}), 200
+    except Exception as e:
+        logging.exception("Error in integrated_load_detector")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@api_bp.route('/integrated/process-crisisnlp', methods=['POST'])
+def integrated_process_crisisnlp():
+    """
+    Process CrisisNLP dataset files for a given event directory.
+    Body: { "event_dir": "data/crisisnlp_dataset/events_set2/kerala_floods_2018", "split": "train|dev|test" }
+    """
+    try:
+        data = request.get_json()
+        if not data or 'event_dir' not in data:
+            return jsonify({'error': 'event_dir is required'}), 400
+        split = data.get('split', 'train')
+        event_dir = data['event_dir']
+        tsv_path = os.path.join(event_dir, f"{os.path.basename(event_dir)}_{split}.tsv")
+        if not os.path.exists(tsv_path):
+            return jsonify({'error': f'file not found: {tsv_path}'}), 400
+
+        # CrisisNLP columns include tweet_text
+        df = pd.read_csv(tsv_path, sep='\t')
+        text_col = 'tweet_text' if 'tweet_text' in df.columns else df.columns[-2]
+        texts = df[text_col].fillna('').astype(str).tolist()
+
+        results = integrated_system.process_dataset(texts)
+        return jsonify({
+            'samples': len(texts),
+            'processing': results
+        }), 200
+    except Exception as e:
+        logging.exception("Error in integrated_process_crisisnlp")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @api_bp.route('/analyze', methods=['POST'])
 def analyze_tweet():
@@ -320,3 +451,6 @@ def get_statistics():
     except Exception as e:
         logging.error(f"Error in get_statistics: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500 
+
+app = Flask(__name__)
+app.register_blueprint(api_bp, url_prefix='/api') 

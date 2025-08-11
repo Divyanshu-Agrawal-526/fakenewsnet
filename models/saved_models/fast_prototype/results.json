@@ -1,0 +1,7 @@
+{
+  "model": "FastFakeNewsDetector",
+  "accuracy": 0.915,
+  "training_date": "2025-08-11T12:20:45.377896",
+  "device": "mps",
+  "sample_size": 1928
+}

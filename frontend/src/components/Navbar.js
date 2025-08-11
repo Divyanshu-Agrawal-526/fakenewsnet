@@ -37,6 +37,7 @@ const Navbar = () => {
     { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
     { text: 'Authorities', path: '/authorities', icon: <ContactIcon /> },
     { text: 'About', path: '/about', icon: <InfoIcon /> },
+    { text: 'Integrated', path: '/integrated' },
   ];
 
   const handleDrawerToggle = () => {

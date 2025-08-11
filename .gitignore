@@ -45,15 +45,23 @@ ehthumbs.db
 Thumbs.db
 
 # Logs
-*.log
 logs/
+*.log
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
 
-# Model files (optional - remove if you want to track them)
+# =====================
+# DATASETS (EXCLUDE)
+# =====================
+# Exclude all large datasets and raw data
+/data/
+!backend/models/saved_models/
+
+# Model files (INCLUDE trained models and checkpoints)
+# Uncomment below if you want to ignore all model files (not recommended)
 # *.pkl
 # *.h5
 # *.pt

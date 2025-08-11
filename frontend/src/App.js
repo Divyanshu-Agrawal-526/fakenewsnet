@@ -11,6 +11,7 @@ import Analyze from './pages/Analyze';
 import Dashboard from './pages/Dashboard';
 import Authorities from './pages/Authorities';
 import About from './pages/About';
+import Integrated from './pages/Integrated';
 
 // Create theme
 const theme = createTheme({
@@ -57,6 +58,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/authorities" element={<Authorities />} />
               <Route path="/about" element={<About />} />
+              <Route path="/integrated" element={<Integrated />} />
             </Routes>
           </div>
         </Router>

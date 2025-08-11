@@ -1,0 +1,6 @@
+{
+  "n_topics": 6,
+  "similarity_threshold": 0.3,
+  "min_community_size": 5,
+  "timestamp": "2025-08-11T13:13:14.933294"
+}

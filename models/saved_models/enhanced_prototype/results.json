@@ -1,0 +1,14 @@
+{
+  "model": "EnhancedFakeNewsDetector",
+  "accuracy": 0.7987804878048781,
+  "training_date": "2025-08-11T12:54:17.243469",
+  "device": "mps",
+  "total_samples": 23128,
+  "feature_dimensions": [
+    9184,
+    2768
+  ],
+  "balanced_dataset": true,
+  "fake_samples": 5740,
+  "real_samples": 17388
+}

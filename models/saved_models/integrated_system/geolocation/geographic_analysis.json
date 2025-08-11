@@ -1,0 +1,104 @@
+{
+  "total_texts": 5000,
+  "texts_with_locations": 95,
+  "texts_with_coordinates": 0,
+  "location_extraction_rate": 0.019,
+  "geocoding_success_rate": 0.0,
+  "top_locations": [
+    [
+      "Louisiana",
+      14
+    ],
+    [
+      "York",
+      4
+    ],
+    [
+      "Indiana",
+      4
+    ],
+    [
+      "Orange",
+      3
+    ],
+    [
+      "The Real Housewives of Orange County",
+      2
+    ],
+    [
+      "minutes to decide to move to Salt Lake City",
+      1
+    ],
+    [
+      "minutes to decide to move to Salt Lake",
+      1
+    ],
+    [
+      "Lake",
+      1
+    ],
+    [
+      "The Real Housewives of New York City",
+      1
+    ],
+    [
+      "Soundsational Parade Grand Marshals at Disneyland Park",
+      1
+    ],
+    [
+      "New York",
+      1
+    ],
+    [
+      "Ramona Singer Previews Drama with Bethenny Frankel at The Real Housewives of New York City",
+      1
+    ],
+    [
+      "en London Airport",
+      1
+    ],
+    [
+      "to perform at Segerstrom Center",
+      1
+    ],
+    [
+      "Prince Philip leaves hospital",
+      1
+    ],
+    [
+      "old Phoenix burn survivor in hospital",
+      1
+    ],
+    [
+      "as River",
+      1
+    ],
+    [
+      "California",
+      1
+    ],
+    [
+      "Scandalous Road",
+      1
+    ],
+    [
+      "Tristan Thompson Spotted at Ohio Hospital",
+      1
+    ]
+  ],
+  "total_unique_locations": 92,
+  "geographic_bounds": {
+    "latitude_range": [
+      0,
+      0
+    ],
+    "longitude_range": [
+      0,
+      0
+    ],
+    "center": [
+      0,
+      0
+    ]
+  }
+}

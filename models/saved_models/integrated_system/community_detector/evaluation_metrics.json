@@ -1,0 +1,9 @@
+{
+  "silhouette": 0.02865361940209723,
+  "davies_bouldin": 4.0765899696439485,
+  "calinski_harabasz": 20.35624831098363,
+  "num_communities": 20,
+  "avg_community_size": 250.0,
+  "avg_similarity": 0.44567065833603464,
+  "avg_density": 0.3580661133670032
+}
